@@ -477,8 +477,6 @@ def _tensor_matrix_multiply(
     num_cols_a_rows_b = a_shape[-1]
     num_cols_b = b_shape[-1]
 
-    num_batches = a_shape[0] if a_batch_stride > 0 else 1
-
     acc = 0.0
     for k in range(0,num_cols_a_rows_b, BLOCK_DIM):
         if i < num_rows_a and (pj + k) < num_cols_a_rows_b:
@@ -489,7 +487,7 @@ def _tensor_matrix_multiply(
         for local_k in range(min(BLOCK_DIM, num_cols_a_rows_b - k)):
             acc += a_shared[pi, local_k] * b_shared[local_k, pj]
 
-    if batch < num_batches and i < out_shape[-2] and j < out_shape[-1]:
+    if i < out_shape[-2] and j < out_shape[-1]:
         out_pos = batch * out_strides[-3] + i * out_strides[-2] + j * out_strides[-1]
         out[out_pos] = acc
 
