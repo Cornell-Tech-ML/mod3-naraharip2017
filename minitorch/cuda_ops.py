@@ -488,7 +488,6 @@ def _tensor_matrix_multiply(
         cuda.syncthreads()
         for local_k in range(min(BLOCK_DIM, num_cols_a_rows_b - k)):
             acc += a_shared[pi, local_k] * b_shared[local_k, pj]
-        cuda.syncthreads()
 
     if batch < num_batches and i < out_shape[-2] and j < out_shape[-1]:
         out_pos = batch * out_strides[-3] + i * out_strides[-2] + j * out_strides[-1]
