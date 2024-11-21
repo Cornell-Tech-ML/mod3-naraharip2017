@@ -495,8 +495,8 @@ def _tensor_matrix_multiply(
         out_pos = batch * out_strides[0] + i * out_strides[1] + j
         out[out_pos] = acc
     
-    if batch == 0 and pi == 0 and pj == 0:  # Only one thread per block
-        print(pi, pj, a_shared)
+    if batch == 0 and pi < num_rows_a and pj == num_cols_a_rows_b:  # Only one thread per block
+        print(pi, pj, a_shared[pi,pj])
     
 
 tensor_matrix_multiply = jit(_tensor_matrix_multiply)
