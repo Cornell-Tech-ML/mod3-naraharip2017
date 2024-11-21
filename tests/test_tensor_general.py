@@ -247,9 +247,6 @@ if numba.cuda.is_available():
         y = minitorch.tensor(y1, backend=shared["cuda"])
         z2 = x @ y
 
-        print("z1: ", z)
-        print("z2: ", z2)
-
         for i in range(size):
             for j in range(size):
                 assert_close(z[i, j], z2[i, j])
@@ -379,5 +376,19 @@ def test_bmm(backend: str, data: DataObject) -> None:
         (a.contiguous().view(D, A, B, 1) * b.contiguous().view(1, 1, B, C))
         .sum(2)
         .view(D, A, C)
+    )
+    assert_close_tensor(c, c2)
+
+@pytest.mark.parametrize("backend", matmul_tests)
+def test_bmm_ex(backend: str, data: DataObject) -> None:
+    a = minitorch.tensor([[[0.00, 0.00],[0.00, 0.00]], [[0.00, 0.00],[0.00, 0.00]], [[0.00, 0.00],[0.00, 1.00]]])
+    b = minitorch.tensor([[[0.00, 0.00], [0.00, 1.00]]])
+
+    c = a @ b
+
+    c2 = (
+        (a.contiguous().view(3, 2, 2, 1) * b.contiguous().view(1, 1, 2, 2))
+        .sum(2)
+        .view(3, 2, 2)
     )
     assert_close_tensor(c, c2)
