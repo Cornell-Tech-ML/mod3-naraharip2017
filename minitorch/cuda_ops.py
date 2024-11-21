@@ -329,7 +329,7 @@ def tensor_reduce(
             to_index(out_pos, out_shape, out_index)
 
             if pos < reduce_size:
-                a_index = out_index.copy()
+                a_index = out_index
                 a_index[reduce_dim] = pos
                 a_storage_pos = index_to_position(a_index, a_strides)
                 cache[pos] = a_storage[a_storage_pos]
