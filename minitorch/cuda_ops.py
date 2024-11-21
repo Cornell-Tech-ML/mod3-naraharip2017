@@ -481,8 +481,8 @@ def _tensor_matrix_multiply(
 
     acc = 0.0
     for k in range(0,num_cols_a_rows_b, BLOCK_DIM):
-        if i < num_rows_a and pj + k < num_cols_a_rows_b:
-            a_shared[pi, pj] = a_storage[batch * a_batch_stride + i * a_strides[-2] + pj + k * a_strides[-1]]
+        if i < num_rows_a and (pj + k) < num_cols_a_rows_b:
+            a_shared[pi, pj] = a_storage[batch * a_batch_stride + i * a_strides[-2] + (pj + k) * a_strides[-1]]
         else:
             a_shared[pi, pj] = 0.0
         if pi + k < num_cols_a_rows_b and j < num_cols_b:
