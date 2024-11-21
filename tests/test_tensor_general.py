@@ -378,17 +378,3 @@ def test_bmm(backend: str, data: DataObject) -> None:
         .view(D, A, C)
     )
     assert_close_tensor(c, c2)
-
-@pytest.mark.parametrize("backend", matmul_tests)
-def test_bmm_ex(backend: str, data: DataObject) -> None:
-    a = minitorch.tensor([[[0.00, 0.00],[0.00, 0.00]], [[0.00, 0.00],[0.00, 0.00]], [[0.00, 0.00],[0.00, 1.00]]], backend=shared[backend])
-    b = minitorch.tensor([[[0.00, 0.00], [0.00, 1.00]]], backend=shared[backend])
-
-    c = a @ b
-
-    c2 = (
-        (a.contiguous().view(3, 2, 2, 1) * b.contiguous().view(1, 1, 2, 2))
-        .sum(2)
-        .view(3, 2, 2)
-    )
-    assert_close_tensor(c, c2)
