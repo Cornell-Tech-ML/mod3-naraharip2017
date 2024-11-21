@@ -392,18 +392,19 @@ def _mm_practice(out: Storage, a: Storage, b: Storage, size: int) -> None:
 
     x, y = cuda.threadIdx.x, cuda.threadIdx.y
 
-    index = x * size + y
+    if x < size and y < size:
+        index = x * size + y
 
-    cache_a[x, y] = a[index]
-    cache_b[x, y] = b[index]
-    cuda.syncthreads()
+        cache_a[x, y] = a[index]
+        cache_b[x, y] = b[index]
+        cuda.syncthreads()
 
-    dot_product = 0.0
+        dot_product = 0.0
 
-    for i in range(size):
-        dot_product += cache_a[x, i] * cache_b[i, y]
-    
-    out[index] = dot_product
+        for i in range(size):
+            dot_product += cache_a[x, i] * cache_b[i, y]
+        
+        out[index] = dot_product
 
 
 jit_mm_practice = jit(_mm_practice)
