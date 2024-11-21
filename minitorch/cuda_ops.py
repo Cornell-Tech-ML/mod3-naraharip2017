@@ -494,6 +494,9 @@ def _tensor_matrix_multiply(
     if batch < num_batches and i < out_shape[1] and j < out_shape[2]:
         out_pos = batch * out_strides[0] + i * out_strides[1] + j
         out[out_pos] = acc
+    
+    if pi == 0 and pj == 0:  # Only one thread per block
+        print("Block (%d, %d, %d): Shared A[0][0] = %f\n", cuda.blockIdx.x, cuda.blockIdx.y, cuda.blockIdx.z, a_shared[0][0])
 
     
 
