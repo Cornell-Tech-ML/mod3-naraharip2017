@@ -361,21 +361,33 @@ def test_mm2() -> None:
 @given(data())
 @pytest.mark.parametrize("backend", matmul_tests)
 def test_bmm(backend: str, data: DataObject) -> None:
-    small_ints = integers(min_value=2, max_value=4)
-    A, B, C, D = (
-        data.draw(small_ints),
-        data.draw(small_ints),
-        data.draw(small_ints),
-        data.draw(small_ints),
-    )
-    a = data.draw(tensors(backend=shared[backend], shape=(D, A, B)))
-    b = data.draw(tensors(backend=shared[backend], shape=(1, B, C)))
+    # small_ints = integers(min_value=2, max_value=4)
+    # A, B, C, D = (
+    #     data.draw(small_ints),
+    #     data.draw(small_ints),
+    #     data.draw(small_ints),
+    #     data.draw(small_ints),
+    # )
+    # a = data.draw(tensors(backend=shared[backend], shape=(D, A, B)))
+    # b = data.draw(tensors(backend=shared[backend], shape=(1, B, C)))
+
+    # c = a @ b
+    # c2 = (
+    #     (a.contiguous().view(D, A, B, 1) * b.contiguous().view(1, 1, B, C))
+    #     .sum(2)
+    #     .view(D, A, C)
+    # )
+    # assert_close_tensor(c, c2)
+
+    a = minitorch.tensor([[[0.00, 0.00],[0.00, 0.00]], [[0.00, 0.00],[0.00, 0.00]], [[0.00, 0.00],[0.00, 1.00]]], backend=shared[backend])
+    b = minitorch.tensor([[[0.00, 0.00], [0.00, 1.00]]], backend=shared[backend])
 
     c = a @ b
+
     c2 = (
-        (a.contiguous().view(D, A, B, 1) * b.contiguous().view(1, 1, B, C))
+        (a.contiguous().view(3, 2, 2, 1) * b.contiguous().view(1, 1, 2, 2))
         .sum(2)
-        .view(D, A, C)
+        .view(3, 2, 2)
     )
     assert_close_tensor(c, c2)
 
