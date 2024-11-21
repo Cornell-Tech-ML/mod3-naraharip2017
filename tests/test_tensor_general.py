@@ -380,9 +380,9 @@ def test_bmm(backend: str, data: DataObject) -> None:
     assert_close_tensor(c, c2)
 
 @pytest.mark.parametrize("backend", matmul_tests)
-def test_bmm_ex(backend: str, data: DataObject) -> None:
-    a = minitorch.tensor([[[0.00, 0.00],[0.00, 0.00]], [[0.00, 0.00],[0.00, 0.00]], [[0.00, 0.00],[0.00, 1.00]]])
-    b = minitorch.tensor([[[0.00, 0.00], [0.00, 1.00]]])
+def test_bmm_ex(backend: str) -> None:
+    a = minitorch.tensor([[[0.00, 0.00],[0.00, 0.00]], [[0.00, 0.00],[0.00, 0.00]], [[0.00, 0.00],[0.00, 1.00]]], backend=shared[backend])
+    b = minitorch.tensor([[[0.00, 0.00], [0.00, 1.00]]], backend=shared[backend])
 
     c = a @ b
 
