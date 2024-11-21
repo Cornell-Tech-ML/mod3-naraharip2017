@@ -493,6 +493,9 @@ def _tensor_matrix_multiply(
             acc += a_shared[pi, local_k] * b_shared[local_k, pj]
     if batch < num_batches and i < out_shape[1] and j < out_shape[2]:
         out_pos = batch * out_strides[0] + i * out_strides[1] + j
-        out[out_pos] = acc
+        # out[out_pos] = acc
+        out[out_pos] = a_shared[pi, pj]
+
+    
 
 tensor_matrix_multiply = jit(_tensor_matrix_multiply)
