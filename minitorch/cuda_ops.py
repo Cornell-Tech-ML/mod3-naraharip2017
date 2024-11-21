@@ -422,6 +422,77 @@ def mm_practice(a: Tensor, b: Tensor) -> TensorData:
     return out
 
 
+# def _tensor_matrix_multiply(
+#     out: Storage,
+#     out_shape: Shape,
+#     out_strides: Strides,
+#     out_size: int,
+#     a_storage: Storage,
+#     a_shape: Shape,
+#     a_strides: Strides,
+#     b_storage: Storage,
+#     b_shape: Shape,
+#     b_strides: Strides,
+# ) -> None:
+#     """CUDA tensor matrix multiply function.
+
+#     Requirements:
+
+#     * All data must be first moved to shared memory.
+#     * Only read each cell in `a` and `b` once.
+#     * Only write to global memory once per kernel.
+
+#     Should work for any tensor shapes that broadcast as long as ::
+
+#     ```python
+#     assert a_shape[-1] == b_shape[-2]
+#     ```
+#     Returns:
+#         None : Fills in `out`
+#     """
+#     a_batch_stride = a_strides[0] if a_shape[0] > 1 else 0
+#     b_batch_stride = b_strides[0] if b_shape[0] > 1 else 0
+#     # Batch dimension - fixed
+#     batch = cuda.blockIdx.z
+
+#     BLOCK_DIM = 32
+#     a_shared = cuda.shared.array((BLOCK_DIM, BLOCK_DIM), numba.float64)
+#     b_shared = cuda.shared.array((BLOCK_DIM, BLOCK_DIM), numba.float64)
+
+#     # The final position c[i, j]
+#     i = cuda.blockIdx.x * cuda.blockDim.x + cuda.threadIdx.x
+#     j = cuda.blockIdx.y * cuda.blockDim.y + cuda.threadIdx.y
+
+#     # The local position in the block.
+#     pi = cuda.threadIdx.x
+#     pj = cuda.threadIdx.y
+
+#     # Code Plan:
+#     # 1) Move across shared dimension by block dim.
+#     #    a) Copy into shared memory for a matrix.
+#     #    b) Copy into shared memory for b matrix
+#     #    c) Compute the dot produce for position c[i, j]
+
+#     num_rows_a = a_shape[-2]
+#     num_cols_a_rows_b = a_shape[-1]
+#     num_cols_b = b_shape[-1]
+
+#     num_batches = a_shape[0] if a_batch_stride > 0 else 1
+
+#     acc = 0.0
+#     for k in range(0,num_cols_a_rows_b, BLOCK_DIM):
+#         if i < num_rows_a and pj + k < num_cols_a_rows_b:
+#             a_shared[pi, pj] = a_storage[batch * a_batch_stride + i * a_strides[-2] + pj + k * a_strides[-1]]
+#         if pi + k < num_cols_a_rows_b and j < num_cols_b:
+#             b_shared[pi, pj] = b_storage[batch * b_batch_stride + (pi+k) * b_strides[-2] + j * b_strides[-1]]
+#         cuda.syncthreads()
+#         for local_k in range(min(BLOCK_DIM, num_cols_a_rows_b - k)):
+#             acc += a_shared[pi, local_k] * b_shared[local_k, pj]
+
+#     if batch < num_batches and i < out_shape[1] and j < out_shape[2]:
+#         out_pos = batch * out_strides[-3] + i * out_strides[-2] + j * out_strides[-1]
+#         out[out_pos] = acc
+
 def _tensor_matrix_multiply(
     out: Storage,
     out_shape: Shape,
@@ -434,63 +505,60 @@ def _tensor_matrix_multiply(
     b_shape: Shape,
     b_strides: Strides,
 ) -> None:
-    """CUDA tensor matrix multiply function.
-
-    Requirements:
-
-    * All data must be first moved to shared memory.
-    * Only read each cell in `a` and `b` once.
-    * Only write to global memory once per kernel.
-
-    Should work for any tensor shapes that broadcast as long as ::
-
-    ```python
-    assert a_shape[-1] == b_shape[-2]
-    ```
-    Returns:
-        None : Fills in `out`
-    """
-    a_batch_stride = a_strides[0] if a_shape[0] > 1 else 0
-    b_batch_stride = b_strides[0] if b_shape[0] > 1 else 0
-    # Batch dimension - fixed
+    a_batch_stride = a_strides[0] if len(a_shape) > 2 and a_shape[0] > 1 else 0
+    b_batch_stride = b_strides[0] if len(b_shape) > 2 and b_shape[0] > 1 else 0
     batch = cuda.blockIdx.z
 
     BLOCK_DIM = 32
     a_shared = cuda.shared.array((BLOCK_DIM, BLOCK_DIM), numba.float64)
     b_shared = cuda.shared.array((BLOCK_DIM, BLOCK_DIM), numba.float64)
 
-    # The final position c[i, j]
     i = cuda.blockIdx.x * cuda.blockDim.x + cuda.threadIdx.x
     j = cuda.blockIdx.y * cuda.blockDim.y + cuda.threadIdx.y
-
-    # The local position in the block.
     pi = cuda.threadIdx.x
     pj = cuda.threadIdx.y
-
-    # Code Plan:
-    # 1) Move across shared dimension by block dim.
-    #    a) Copy into shared memory for a matrix.
-    #    b) Copy into shared memory for b matrix
-    #    c) Compute the dot produce for position c[i, j]
 
     num_rows_a = a_shape[-2]
     num_cols_a_rows_b = a_shape[-1]
     num_cols_b = b_shape[-1]
-
-    num_batches = a_shape[0] if a_batch_stride > 0 else 1
+    num_batches = a_shape[0] if len(a_shape) > 2 else 1
 
     acc = 0.0
-    for k in range(0,num_cols_a_rows_b, BLOCK_DIM):
-        if i < num_rows_a and pj + k < num_cols_a_rows_b:
-            a_shared[pi, pj] = a_storage[batch * a_batch_stride + i * a_strides[-2] + pj + k * a_strides[-1]]
-        if pi + k < num_cols_a_rows_b and j < num_cols_b:
-            b_shared[pi, pj] = b_storage[batch * b_batch_stride + (pi+k) * b_strides[-2] + j * b_strides[-1]]
+    for k in range(0, num_cols_a_rows_b, BLOCK_DIM):
+        # Copy A into shared memory
+        if i < num_rows_a and (pj + k) < num_cols_a_rows_b:
+            a_shared[pi, pj] = a_storage[
+                batch * a_batch_stride
+                + i * a_strides[-2]
+                + (pj + k) * a_strides[-1]
+            ]
+        else:
+            a_shared[pi, pj] = 0.0  # Handle out-of-bounds
+
+        # Copy B into shared memory
+        if (pi + k) < num_cols_a_rows_b and j < num_cols_b:
+            b_shared[pi, pj] = b_storage[
+                batch * b_batch_stride
+                + (pi + k) * b_strides[-2]
+                + j * b_strides[-1]
+            ]
+        else:
+            b_shared[pi, pj] = 0.0  # Handle out-of-bounds
+
         cuda.syncthreads()
+
+        # Perform matrix multiplication within the tile
         for local_k in range(min(BLOCK_DIM, num_cols_a_rows_b - k)):
             acc += a_shared[pi, local_k] * b_shared[local_k, pj]
 
-    if batch < num_batches and i < out_shape[1] and j < out_shape[2]:
-        out_pos = batch * out_strides[-3] + i * out_strides[-2] + j * out_strides[-1]
+        cuda.syncthreads()
+
+    # Write the result to global memory
+    if batch < num_batches and i < out_shape[-2] and j < out_shape[-1]:
+        out_pos = (
+            batch * out_strides[0] + i * out_strides[-2] + j * out_strides[-1]
+        )
         out[out_pos] = acc
+
 
 tensor_matrix_multiply = jit(_tensor_matrix_multiply)
