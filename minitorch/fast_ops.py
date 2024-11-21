@@ -171,9 +171,9 @@ def tensor_map(
         # TODO: Implement for Task 3.1.
 
         for i in prange(len(out)):
-            # if np.array_equal(out_strides, in_strides):
-            #     out[i] = fn(in_storage[i])
-            #     continue
+            if np.array_equal(out_strides, in_strides) and np.array_equal(out_shape, in_shape):
+                out[i] = fn(in_storage[i])
+                continue
 
             out_index: Index = np.zeros(MAX_DIMS, dtype=np.int32)
             in_index: Index = np.zeros(MAX_DIMS, dtype=np.int32)
@@ -224,7 +224,7 @@ def tensor_zip(
         # TODO: Implement for Task 3.1.
         for i in prange(len(out)):
 
-            # if np.array_equal(out_strides, a_strides) and np.array_equal(out_strides, b_strides):
+            # if np.array_equal(a_strides, b_strides) and np.array_equal(a_shape, b_shape):
             #     out[i] = fn(a_storage[i], b_storage[i])
             #     continue
 
