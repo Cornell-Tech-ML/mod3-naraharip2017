@@ -130,6 +130,10 @@ class CudaOps(TensorOps):
         )
         threadsperblock = (THREADS_PER_BLOCK, THREADS_PER_BLOCK, 1)
 
+        print("out shape", out.shape)
+        print("a shape", a.shape)
+        print("b shape", b.shape)
+
         tensor_matrix_multiply[blockspergrid, threadsperblock](
             *out.tuple(), out.size, *a.tuple(), *b.tuple()
         )
@@ -478,24 +482,13 @@ def _tensor_matrix_multiply(
     num_cols_a_rows_b = a_shape[-1]
     num_cols_b = b_shape[-1]
 
-    if a_shape[0] == 1:
-        a_batch = 0
-    else:
-        a_batch = batch
-
-    if b_shape[0] == 1:
-        b_batch = 0
-    else:
-        b_batch = batch
-        
-
     acc = 0.0
     for k in range(0,num_cols_a_rows_b, BLOCK_DIM):
         if i < num_rows_a and pj + k < num_cols_a_rows_b:
-            a_shared[pi, pj] = a_storage[a_batch * a_batch_stride + i * a_strides[-2] + pj + k]
+            a_shared[pi, pj] = a_storage[batch * a_batch_stride + i * a_strides[-2] + pj + k]
             # a_shared[pi, pj] = a_storage[batch * a_batch_stride + pi * a_strides[-2] + pj + k]
         if pi + k < num_cols_a_rows_b and j < num_cols_b:
-            b_shared[pi, pj] = b_storage[b_batch * b_batch_stride + (pi+k) * b_strides[-2] + j]
+            b_shared[pi, pj] = b_storage[batch * b_batch_stride + (pi+k) * b_strides[-2] + j]
             # b_shared[pi, pj] = b_storage[batch * b_batch_stride + pi * b_strides[-2] + pj + k]
         cuda.syncthreads()
         for local_k in range(min(BLOCK_DIM, num_cols_a_rows_b - k)):
@@ -503,10 +496,5 @@ def _tensor_matrix_multiply(
     if batch < out_shape[0] and i < out_shape[1] and j < out_shape[2]:
         out_pos = batch * out_strides[0] + i * out_strides[1] + j
         out[out_pos] = acc
-
-
-    
-
-
 
 tensor_matrix_multiply = jit(_tensor_matrix_multiply)
