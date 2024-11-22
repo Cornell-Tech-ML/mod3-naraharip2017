@@ -47,8 +47,8 @@ def index_to_position(index: Index, strides: Strides) -> int:
 
     """
     position = 0
-    for ind,stride in zip(index,strides):
-        position+= ind * stride
+    for ind, stride in zip(index, strides):
+        position += ind * stride
     return position
 
 
@@ -143,7 +143,7 @@ def shape_broadcast(shape1: UserShape, shape2: UserShape) -> UserShape:
     # final_shape = list(larger_shape[:length_diff]) + final_shape
 
     # return tuple(final_shape)
-    a,b = shape1,shape2
+    a, b = shape1, shape2
     m = max(len(a), len(b))
     c_rev = [0] * m
     a_rev = list(reversed(a))
@@ -157,7 +157,7 @@ def shape_broadcast(shape1: UserShape, shape2: UserShape) -> UserShape:
             c_rev[i] = max(a_rev[i], b_rev[i])
             if a_rev[i] != c_rev[i] and a_rev[i] != 1:
                 raise IndexingError(f"Broadcast failure {a} {b}")
-            if b_rev[i] != c_rev[i] and b_rev[i] !=1:
+            if b_rev[i] != c_rev[i] and b_rev[i] != 1:
                 raise IndexingError(f"Broadcast failure {a} {b}")
     return tuple(reversed(c_rev))
 
@@ -299,7 +299,7 @@ class TensorData:
         return TensorData(
             self._storage,
             tuple([self.shape[o] for o in order]),
-            tuple([self._strides[o] for o in order])
+            tuple([self._strides[o] for o in order]),
         )
 
     def to_string(self) -> str:

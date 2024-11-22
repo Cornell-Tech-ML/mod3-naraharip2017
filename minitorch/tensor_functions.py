@@ -14,7 +14,7 @@ from .autodiff import Context
 from .tensor_ops import SimpleBackend, TensorBackend
 
 if TYPE_CHECKING:
-    from typing import Any, List, Optional, Tuple, Union
+    from typing import Any, List, Optional, Tuple
 
     from .tensor import Tensor
     from .tensor_data import UserIndex, UserShape
@@ -194,11 +194,9 @@ class Sum(Function):
         """Sum tensor over dimension. If no dimension is provided, sum all elements."""
         ctx.save_for_backward(a.shape, dim)
         return a.f.add_reduce(a, int(dim.item()))
-    
+
     @staticmethod
-    def backward(
-        ctx: Context, grad_output: Tensor
-    ) -> Tuple[Tensor, float]:
+    def backward(ctx: Context, grad_output: Tensor) -> Tuple[Tensor, float]:
         """Derivative of sum function"""
         a_shape, dim = ctx.saved_values
         return grad_output, 0.0

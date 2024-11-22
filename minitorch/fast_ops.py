@@ -30,6 +30,7 @@ Fn = TypeVar("Fn")
 
 
 def njit(fn: Fn, **kwargs: Any) -> Fn:
+    """Decorator to JIT compile functions with NUMBA."""
     return _njit(inline="always", **kwargs)(fn)  # type: ignore
 
 
@@ -169,7 +170,9 @@ def tensor_map(
         in_strides: Strides,
     ) -> None:
         for i in prange(len(out)):
-            if np.array_equal(out_strides, in_strides) and np.array_equal(out_shape, in_shape):
+            if np.array_equal(out_strides, in_strides) and np.array_equal(
+                out_shape, in_shape
+            ):
                 out[i] = fn(in_storage[i])
                 continue
 
@@ -220,7 +223,6 @@ def tensor_zip(
         b_strides: Strides,
     ) -> None:
         for i in prange(len(out)):
-
             # if np.array_equal(a_strides, b_strides) and np.array_equal(a_shape, b_shape):
             #     out[i] = fn(a_storage[i], b_storage[i])
             #     continue
@@ -268,9 +270,8 @@ def tensor_reduce(
         a_shape: Shape,
         a_strides: Strides,
         reduce_dim: int,
-    ) -> None:        
+    ) -> None:
         for i in prange(len(out)):
-
             out_index: Index = np.zeros(MAX_DIMS, dtype=np.int32)
             reduce_size = a_shape[reduce_dim]
             to_index(i, out_shape, out_index)
@@ -281,8 +282,7 @@ def tensor_reduce(
 
             accumulate = a_storage[start_pos]
             for s in range(1, reduce_size):
-                
-                next_pos = start_pos + s * a_strides[reduce_dim]
+                next_pos = start_pos + s * int(a_strides[reduce_dim])
                 next_val = a_storage[next_pos]
                 accumulate = fn(accumulate, next_val)
 
@@ -354,7 +354,9 @@ def _tensor_matrix_multiply(
                     b_pos = b_start + k * b_strides[-2] + j * b_strides[-1]
                     dot_product += a_storage[a_pos] * b_storage[b_pos]
 
-                out_pos = batch * out_strides[0] + i * out_strides[-2] + j * out_strides[-1]
+                out_pos = (
+                    batch * out_strides[0] + i * out_strides[-2] + j * out_strides[-1]
+                )
                 out[out_pos] = dot_product
 
 
