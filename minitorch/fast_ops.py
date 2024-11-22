@@ -174,16 +174,15 @@ def tensor_map(
                 out_shape, in_shape
             ):
                 out[i] = fn(in_storage[i])
-                continue
+            else:
+                out_index: Index = np.zeros(MAX_DIMS, dtype=np.int32)
+                in_index: Index = np.zeros(MAX_DIMS, dtype=np.int32)
 
-            out_index: Index = np.zeros(MAX_DIMS, dtype=np.int32)
-            in_index: Index = np.zeros(MAX_DIMS, dtype=np.int32)
-
-            to_index(i, out_shape, out_index)
-            broadcast_index(out_index, out_shape, in_shape, in_index)
-            o = index_to_position(out_index, out_strides)
-            j = index_to_position(in_index, in_strides)
-            out[o] = fn(in_storage[j])
+                to_index(i, out_shape, out_index)
+                broadcast_index(out_index, out_shape, in_shape, in_index)
+                o = index_to_position(out_index, out_strides)
+                j = index_to_position(in_index, in_strides)
+                out[o] = fn(in_storage[j])
 
     return njit(_map, parallel=True)  # type: ignore
 
@@ -223,20 +222,24 @@ def tensor_zip(
         b_strides: Strides,
     ) -> None:
         for i in prange(len(out)):
-            # if np.array_equal(a_strides, b_strides) and np.array_equal(a_shape, b_shape):
-            #     out[i] = fn(a_storage[i], b_storage[i])
-            #     continue
-
-            out_index: Index = np.zeros(MAX_DIMS, dtype=np.int32)
-            a_index: Index = np.zeros(MAX_DIMS, dtype=np.int32)
-            b_index: Index = np.zeros(MAX_DIMS, dtype=np.int32)
-            to_index(i, out_shape, out_index)
-            o = index_to_position(out_index, out_strides)
-            broadcast_index(out_index, out_shape, a_shape, a_index)
-            j = index_to_position(a_index, a_strides)
-            broadcast_index(out_index, out_shape, b_shape, b_index)
-            k = index_to_position(b_index, b_strides)
-            out[o] = fn(a_storage[j], b_storage[k])
+            if (
+                np.array_equal(out_strides, a_strides)
+                and np.array_equal(out_shape, a_shape)
+                and np.array_equal(a_strides, b_strides)
+                and np.array_equal(a_shape, b_shape)
+            ):
+                out[i] = fn(a_storage[i], b_storage[i])
+            else:
+                out_index: Index = np.zeros(MAX_DIMS, dtype=np.int32)
+                a_index: Index = np.zeros(MAX_DIMS, dtype=np.int32)
+                b_index: Index = np.zeros(MAX_DIMS, dtype=np.int32)
+                to_index(i, out_shape, out_index)
+                o = index_to_position(out_index, out_strides)
+                broadcast_index(out_index, out_shape, a_shape, a_index)
+                j = index_to_position(a_index, a_strides)
+                broadcast_index(out_index, out_shape, b_shape, b_index)
+                k = index_to_position(b_index, b_strides)
+                out[o] = fn(a_storage[j], b_storage[k])
 
     return njit(_zip, parallel=True)  # type: ignore
 
@@ -355,7 +358,7 @@ def _tensor_matrix_multiply(
                     dot_product += a_storage[a_pos] * b_storage[b_pos]
 
                 out_pos = (
-                    batch * out_strides[0] + i * out_strides[-2] + j * out_strides[-1]
+                    batch * out_strides[-3] + i * out_strides[-2] + j * out_strides[-1]
                 )
                 out[out_pos] = dot_product
 

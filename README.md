@@ -31,6 +31,9 @@ The files that will be synced are:
 
         minitorch/tensor_data.py minitorch/tensor_functions.py minitorch/tensor_ops.py minitorch/operators.py minitorch/scalar.py minitorch/scalar_functions.py minitorch/module.py minitorch/autodiff.py minitorch/module.py project/run_manual.py project/run_scalar.py project/run_tensor.py minitorch/operators.py minitorch/module.py minitorch/autodiff.py minitorch/tensor.py minitorch/datasets.py minitorch/testing.py minitorch/optim.py
 
+# Module 3.1 Parallel Script Output
+
+
 # Module 3.2 Parallel Script Output
 ```
 Parallel loop listing for  Function _tensor_matrix_multiply, /Users/pavan/Documents/Weill Cornell/Fall 2024/Machine Learning Engineering/workspace/mod3-naraharip2017/minitorch/fast_ops.py (294)
@@ -122,7 +125,7 @@ None
 
 # Module 3.4 Matrix Multiplication Timing Comparison
 
-Running `timing.py` script from [here](https://gist.github.com/justinchiu/e153cbfa667ee8212c5fe40e12252c8a) (Credits to Hashim Hayat and Justin Chiu for the script) shows clear speed increases with the GPU on larger matrices
+Running `timing.py` script from [here](https://gist.github.com/justinchiu/e153cbfa667ee8212c5fe40e12252c8a) (Credits to Hashim Hayat and Justin Chiu for the script as posted in ed discussion by TA) shows clear speed increases with the GPU on larger matrices
 
 ```
 Timing summary
@@ -326,6 +329,45 @@ Epoch  480  | Loss  0.425319429956869  | Correct 49 | Time Per Epoch 0.216143820
 Epoch  490  | Loss  1.8162251184676907  | Correct 49 | Time Per Epoch 0.21503603288452397
 ```
 
+### Bigger Model
+
+```
+!cd $DIR; PYTHONPATH=/content/$DIR python3.10 project/run_fast_tensor.py --BACKEND cpu --HIDDEN 200 --DATASET xor --RATE 0.05
+```
+
+```
+Epoch  0  | Loss  42.088777080541384  | Correct 43 | Time Per Epoch 15.256327867507935
+Epoch  10  | Loss  3.258085801164338  | Correct 44 | Time Per Epoch 2.1366918737238105
+Epoch  20  | Loss  3.2275328395731884  | Correct 42 | Time Per Epoch 1.305040961220151
+Epoch  30  | Loss  2.0548208687554226  | Correct 45 | Time Per Epoch 1.046562348642657
+Epoch  40  | Loss  3.321976894389734  | Correct 44 | Time Per Epoch 0.9132529875127281
+Epoch  50  | Loss  1.6228384872833577  | Correct 45 | Time Per Epoch 0.8100668262032902
+Epoch  60  | Loss  1.6660192745918294  | Correct 45 | Time Per Epoch 0.7520056552574282
+Epoch  70  | Loss  3.31379439320977  | Correct 47 | Time Per Epoch 0.7078766755654778
+Epoch  80  | Loss  1.9248731544986708  | Correct 43 | Time Per Epoch 0.6679936662132357
+Epoch  90  | Loss  1.5399347350409758  | Correct 47 | Time Per Epoch 0.6474152449723128
+Epoch  100  | Loss  1.5171707528798917  | Correct 46 | Time Per Epoch 0.6231619745197863
+Epoch  110  | Loss  2.9731024766053005  | Correct 48 | Time Per Epoch 0.6019774621671384
+Epoch  120  | Loss  1.6092276496693543  | Correct 47 | Time Per Epoch 0.5931836928217864
+Epoch  130  | Loss  1.6433027960587976  | Correct 46 | Time Per Epoch 0.5774866606442983
+Epoch  140  | Loss  2.1726827539001654  | Correct 49 | Time Per Epoch 0.56384469600434
+Epoch  150  | Loss  1.1815040661307639  | Correct 48 | Time Per Epoch 0.5593410122473508
+Epoch  160  | Loss  1.7869488136386282  | Correct 47 | Time Per Epoch 0.5487265542427205
+Epoch  170  | Loss  2.4753412593241584  | Correct 47 | Time Per Epoch 0.5392264985201651
+Epoch  180  | Loss  1.6752034150539334  | Correct 47 | Time Per Epoch 0.5369009550105143
+Epoch  190  | Loss  0.6271837978333619  | Correct 49 | Time Per Epoch 0.5289547218702226
+Epoch  200  | Loss  0.14720315980943618  | Correct 49 | Time Per Epoch 0.5217895045209286
+Epoch  210  | Loss  1.1051074343806722  | Correct 47 | Time Per Epoch 0.520743789266071
+Epoch  220  | Loss  1.245523243451931  | Correct 50 | Time Per Epoch 0.5146499780508188
+Epoch  230  | Loss  0.6983208276271895  | Correct 47 | Time Per Epoch 0.5094492167105407
+Epoch  240  | Loss  0.491591765590955  | Correct 50 | Time Per Epoch 0.5089278300273468
+Epoch  250  | Loss  4.144215355301456  | Correct 44 | Time Per Epoch 0.5040934560783356
+Epoch  260  | Loss  1.9536593274832152  | Correct 50 | Time Per Epoch 0.4995877742767334
+Epoch  270  | Loss  0.38077808268432417  | Correct 49 | Time Per Epoch 0.49937750228656613
+Epoch  280  | Loss  1.9840076697505067  | Correct 49 | Time Per Epoch 0.4954178867815228
+Epoch  290  | Loss  1.4211876665704128  | Correct 50 | Time Per Epoch 0.4917561737532468
+```
+
 ## GPU
 
 ### Simple
@@ -434,4 +476,29 @@ Epoch  220  | Loss  1.3334546465019956  | Correct 50 | Time Per Epoch 2.00088373
 Epoch  230  | Loss  2.21340064853366  | Correct 48 | Time Per Epoch 2.000759794598534
 Epoch  240  | Loss  0.36169603802896994  | Correct 48 | Time Per Epoch 1.9976777268643202
 Epoch  250  | Loss  1.154437666527763  | Correct 50 | Time Per Epoch 1.998247179852064
+```
+
+### Bigger Model
+
+```
+!cd $DIR; PYTHONPATH=/content/$DIR python3.10 project/run_fast_tensor.py --BACKEND gpu --HIDDEN 200 --DATASET xor --RATE 0.05
+```
+
+```
+Epoch  0  | Loss  10.369445313718877  | Correct 28 | Time Per Epoch 3.8715810775756836
+Epoch  10  | Loss  1.9747781483633948  | Correct 47 | Time Per Epoch 2.2654551809484307
+Epoch  20  | Loss  2.279816983568601  | Correct 45 | Time Per Epoch 2.1762904666718983
+Epoch  30  | Loss  1.8298229067371168  | Correct 49 | Time Per Epoch 2.1197482078306136
+Epoch  40  | Loss  4.690087998829658  | Correct 49 | Time Per Epoch 2.1105315045612616
+Epoch  50  | Loss  2.2645133146461376  | Correct 48 | Time Per Epoch 2.105800338819915
+Epoch  60  | Loss  3.828529084700226  | Correct 44 | Time Per Epoch 2.0883605519279103
+Epoch  70  | Loss  2.2544906393118964  | Correct 49 | Time Per Epoch 2.084563738863233
+Epoch  80  | Loss  0.8329164868093372  | Correct 49 | Time Per Epoch 2.0790497991773815
+Epoch  90  | Loss  0.7975990495662761  | Correct 49 | Time Per Epoch 2.0692497347737406
+Epoch  100  | Loss  0.8913821604907051  | Correct 50 | Time Per Epoch 2.0709285948536182
+Epoch  110  | Loss  0.5295864989126102  | Correct 50 | Time Per Epoch 2.0679018046404862
+Epoch  120  | Loss  0.6697080455448908  | Correct 50 | Time Per Epoch 2.0660208414408787
+Epoch  130  | Loss  1.0670529642813555  | Correct 50 | Time Per Epoch 2.0578348127030233
+Epoch  140  | Loss  0.695990147652689  | Correct 50 | Time Per Epoch 2.0568154822004603
+Epoch  150  | Loss  0.5906200139327783  | Correct 50 | Time Per Epoch 2.0561753803531064
 ```
