@@ -338,3 +338,75 @@ Epoch  240  | Loss  0.0743496367075983  | Correct 50 | Time Per Epoch 1.97005449
 Epoch  250  | Loss  0.7727130698620138  | Correct 50 | Time Per Epoch 1.9672665852474502
 ```
 
+### Split
+
+```
+!cd $DIR; PYTHONPATH=/content/$DIR python3.10 project/run_fast_tensor.py --BACKEND gpu --HIDDEN 100 --DATASET split --RATE 0.05
+```
+
+```
+Epoch  0  | Loss  6.331044839817644  | Correct 31 | Time Per Epoch 3.834259271621704
+Epoch  10  | Loss  3.3924353166402748  | Correct 45 | Time Per Epoch 2.197649457237937
+Epoch  20  | Loss  4.540281771073794  | Correct 47 | Time Per Epoch 2.066849572317941
+Epoch  30  | Loss  2.680305727588426  | Correct 42 | Time Per Epoch 2.0434179229121052
+Epoch  40  | Loss  4.512944988285868  | Correct 44 | Time Per Epoch 2.017704312394305
+Epoch  50  | Loss  3.188499501365822  | Correct 48 | Time Per Epoch 2.0105330336327647
+Epoch  60  | Loss  4.122048245146361  | Correct 48 | Time Per Epoch 2.0077001579472276
+Epoch  70  | Loss  3.4391584487936253  | Correct 48 | Time Per Epoch 1.9943387038271192
+Epoch  80  | Loss  0.9307015202350932  | Correct 48 | Time Per Epoch 2.0035733705685463
+Epoch  90  | Loss  1.9538642026845965  | Correct 48 | Time Per Epoch 2.0001592531309025
+Epoch  100  | Loss  1.2880753214685259  | Correct 48 | Time Per Epoch 1.9915346013437403
+Epoch  110  | Loss  1.189541907544037  | Correct 46 | Time Per Epoch 1.9905638028909494
+Epoch  120  | Loss  1.0901852497214166  | Correct 49 | Time Per Epoch 1.9836761419438134
+Epoch  130  | Loss  0.9830567897018246  | Correct 49 | Time Per Epoch 1.9834493935563182
+Epoch  140  | Loss  0.2815274495401816  | Correct 49 | Time Per Epoch 1.9821740650961586
+Epoch  150  | Loss  0.25895855354196073  | Correct 49 | Time Per Epoch 1.978792021606142
+Epoch  160  | Loss  1.2389815769066734  | Correct 50 | Time Per Epoch 1.978782458334976
+Epoch  170  | Loss  0.7505347644026565  | Correct 49 | Time Per Epoch 1.9748187650714004
+Epoch  180  | Loss  1.307405399867514  | Correct 49 | Time Per Epoch 1.9770165938698785
+Epoch  190  | Loss  0.7628729979626958  | Correct 50 | Time Per Epoch 1.9785893000857369
+Epoch  200  | Loss  1.3524847095491386  | Correct 50 | Time Per Epoch 1.9808527047361308
+Epoch  210  | Loss  1.5762720210866596  | Correct 49 | Time Per Epoch 1.9816023648067673
+Epoch  220  | Loss  0.753411161685201  | Correct 48 | Time Per Epoch 1.9786160693449133
+Epoch  230  | Loss  0.542719396541001  | Correct 50 | Time Per Epoch 1.9789304175934235
+Epoch  240  | Loss  0.2052691758641954  | Correct 50 | Time Per Epoch 1.9786594012960854
+Epoch  250  | Loss  0.3745931563931699  | Correct 50 | Time Per Epoch 1.9769034205204936
+Epoch  260  | Loss  0.18316749491320528  | Correct 50 | Time Per Epoch 1.977160293023705
+Epoch  270  | Loss  0.5486116772216989  | Correct 50 | Time Per Epoch 1.9746197264132905
+Epoch  280  | Loss  1.088186044723263  | Correct 50 | Time Per Epoch 1.9752925816804066
+```
+
+### Xor
+
+```
+!cd $DIR; PYTHONPATH=/content/$DIR python3.10 project/run_fast_tensor.py --BACKEND gpu --HIDDEN 100 --DATASET xor --RATE 0.05
+```
+
+```
+Epoch  0  | Loss  6.834077171712407  | Correct 32 | Time Per Epoch 3.8366544246673584
+Epoch  10  | Loss  3.995261727857253  | Correct 40 | Time Per Epoch 2.2174539132551714
+Epoch  20  | Loss  4.291975924919084  | Correct 46 | Time Per Epoch 2.1607468922932944
+Epoch  30  | Loss  5.198667161940623  | Correct 45 | Time Per Epoch 2.1002593578830844
+Epoch  40  | Loss  4.605561782344706  | Correct 41 | Time Per Epoch 2.08226027721312
+Epoch  50  | Loss  2.938537490085119  | Correct 44 | Time Per Epoch 2.0543612592360554
+Epoch  60  | Loss  5.954972492742877  | Correct 42 | Time Per Epoch 2.0465298207079776
+Epoch  70  | Loss  4.039186724253254  | Correct 46 | Time Per Epoch 2.0413695792077293
+Epoch  80  | Loss  1.7426245239079095  | Correct 47 | Time Per Epoch 2.0278244460070574
+Epoch  90  | Loss  3.380198551124139  | Correct 47 | Time Per Epoch 2.0256930393177073
+Epoch  100  | Loss  1.9306310596279739  | Correct 45 | Time Per Epoch 2.0187657847262845
+Epoch  110  | Loss  3.9721368724340236  | Correct 47 | Time Per Epoch 2.014262596766154
+Epoch  120  | Loss  1.1763924262159282  | Correct 47 | Time Per Epoch 2.0139885914227196
+Epoch  130  | Loss  0.6573681280458044  | Correct 48 | Time Per Epoch 2.0070119322711273
+Epoch  140  | Loss  1.552888892317414  | Correct 47 | Time Per Epoch 2.0135057801050498
+Epoch  150  | Loss  1.1458417440222999  | Correct 49 | Time Per Epoch 2.013549042063833
+Epoch  160  | Loss  2.6040769516677766  | Correct 49 | Time Per Epoch 2.0075748144469645
+Epoch  170  | Loss  1.8303412757823658  | Correct 49 | Time Per Epoch 2.0072818192822193
+Epoch  180  | Loss  0.6023675647586028  | Correct 48 | Time Per Epoch 2.0053631653443227
+Epoch  190  | Loss  0.4594083973789075  | Correct 49 | Time Per Epoch 2.0041705351225367
+Epoch  200  | Loss  1.7019136386417937  | Correct 48 | Time Per Epoch 2.0045180973128893
+Epoch  210  | Loss  1.0613961468286053  | Correct 49 | Time Per Epoch 2.000701317854967
+Epoch  220  | Loss  1.3334546465019956  | Correct 50 | Time Per Epoch 2.000883734603813
+Epoch  230  | Loss  2.21340064853366  | Correct 48 | Time Per Epoch 2.000759794598534
+Epoch  240  | Loss  0.36169603802896994  | Correct 48 | Time Per Epoch 1.9976777268643202
+Epoch  250  | Loss  1.154437666527763  | Correct 50 | Time Per Epoch 1.998247179852064
+```
