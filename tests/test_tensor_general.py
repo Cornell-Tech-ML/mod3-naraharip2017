@@ -368,7 +368,6 @@ def test_bmm(backend: str, data: DataObject) -> None:
         data.draw(small_ints),
         data.draw(small_ints),
     )
-    D = 1
     a = data.draw(tensors(backend=shared[backend], shape=(D, A, B)))
     b = data.draw(tensors(backend=shared[backend], shape=(1, B, C)))
 
