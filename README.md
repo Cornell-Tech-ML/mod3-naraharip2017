@@ -31,7 +31,7 @@ The files that will be synced are:
 
         minitorch/tensor_data.py minitorch/tensor_functions.py minitorch/tensor_ops.py minitorch/operators.py minitorch/scalar.py minitorch/scalar_functions.py minitorch/module.py minitorch/autodiff.py minitorch/module.py project/run_manual.py project/run_scalar.py project/run_tensor.py minitorch/operators.py minitorch/module.py minitorch/autodiff.py minitorch/tensor.py minitorch/datasets.py minitorch/testing.py minitorch/optim.py
 
-### Module 3.2 Parallel Script Output
+# Module 3.2 Parallel Script Output
 ```
 Parallel loop listing for  Function _tensor_matrix_multiply, /Users/pavan/Documents/Weill Cornell/Fall 2024/Machine Learning Engineering/workspace/mod3-naraharip2017/minitorch/fast_ops.py (294)
 ------------------------------------------------------------------------------------------|loop #ID
@@ -119,6 +119,31 @@ Allocation hoisting:
 No allocation hoisting found
 None
 ```
+
+# Module 3.4 Matrix Multiplication Timing Comparison
+
+Running `timing.py` script from [here](https://gist.github.com/justinchiu/e153cbfa667ee8212c5fe40e12252c8a) (Credits to Hashim Hayat and Justin Chiu for the script) shows clear speed increases with the GPU on larger matrices
+
+```
+Timing summary
+Size: 64
+    fast: 0.00387
+    gpu: 0.00697
+Size: 128
+    fast: 0.01665
+    gpu: 0.01536
+Size: 256
+    fast: 0.09536
+    gpu: 0.05353
+Size: 512
+    fast: 1.00520
+    gpu: 0.22371
+Size: 1024
+    fast: 7.91582
+    gpu: 0.97955
+```
+
+
 
 # Training
 
