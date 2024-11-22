@@ -173,7 +173,6 @@ def tensor_map(
         out_index = cuda.local.array(MAX_DIMS, numba.int32)
         in_index = cuda.local.array(MAX_DIMS, numba.int32)
         i = cuda.blockIdx.x * cuda.blockDim.x + cuda.threadIdx.x
-        # TODO: Implement for Task 3.3.
         if i < len(out):
             to_index(i, out_shape, out_index)
             broadcast_index(out_index, out_shape, in_shape, in_index)
@@ -221,7 +220,6 @@ def tensor_zip(
         b_index = cuda.local.array(MAX_DIMS, numba.int32)
         i = cuda.blockIdx.x * cuda.blockDim.x + cuda.threadIdx.x
 
-        # TODO: Implement for Task 3.3.
         if i < len(out):
             to_index(i, out_shape, out_index)
             o = index_to_position(out_index, out_strides)
@@ -345,11 +343,7 @@ def tensor_reduce(
                 cuda.syncthreads()
 
             if pos == 0:
-                out[out_pos] = cache[0]
-
-
-        # TODO: Implement for Task 3.3.
-        
+                out[out_pos] = cache[0]        
 
     return jit(_reduce)  # type: ignore
 
@@ -386,7 +380,6 @@ def _mm_practice(out: Storage, a: Storage, b: Storage, size: int) -> None:
 
     """
     BLOCK_DIM = 32
-    # TODO: Implement for Task 3.3.
     cache_a = cuda.shared.array((BLOCK_DIM, BLOCK_DIM), numba.float64)
     cache_b = cuda.shared.array((BLOCK_DIM, BLOCK_DIM), numba.float64)
 

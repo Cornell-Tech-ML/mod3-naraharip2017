@@ -168,8 +168,6 @@ def tensor_map(
         in_shape: Shape,
         in_strides: Strides,
     ) -> None:
-        # TODO: Implement for Task 3.1.
-
         for i in prange(len(out)):
             if np.array_equal(out_strides, in_strides) and np.array_equal(out_shape, in_shape):
                 out[i] = fn(in_storage[i])
@@ -221,7 +219,6 @@ def tensor_zip(
         b_shape: Shape,
         b_strides: Strides,
     ) -> None:
-        # TODO: Implement for Task 3.1.
         for i in prange(len(out)):
 
             # if np.array_equal(a_strides, b_strides) and np.array_equal(a_shape, b_shape):
@@ -271,39 +268,25 @@ def tensor_reduce(
         a_shape: Shape,
         a_strides: Strides,
         reduce_dim: int,
-    ) -> None:
-        # TODO: Implement for Task 3.1.
-        
+    ) -> None:        
         for i in prange(len(out)):
-            # out_index: Index = np.zeros(MAX_DIMS, dtype=np.int32)
-            # reduce_size = a_shape[reduce_dim]
-
-            # to_index(i, out_shape, out_index)
-            # o = index_to_position(out_index, out_strides)
-
-            # accumulator = 0.0
-
-            # base_position = 0
-            # for d in range(len(a_shape)):
-            #     if d != reduce_dim:
-            #         base_position += out_index[d] * a_strides[d]
-
-            # for s in range(reduce_size):
-            #     pos = base_position + s * a_strides[reduce_dim]
-            #     accumulator += a_storage[pos]
-
-            # out[o] = accumulator
 
             out_index: Index = np.zeros(MAX_DIMS, dtype=np.int32)
             reduce_size = a_shape[reduce_dim]
-
             to_index(i, out_shape, out_index)
-            o = index_to_position(out_index, out_strides)
-            for s in range(reduce_size):
-                out_index[reduce_dim] = s
-                j = index_to_position(out_index, a_strides)
-                out[o] = fn(out[o], a_storage[j])
 
+            out_index[reduce_dim] = 0
+
+            start_pos = index_to_position(out_index, a_strides)
+
+            accumulate = a_storage[start_pos]
+            for s in range(1, reduce_size):
+                
+                next_pos = start_pos + s * a_strides[reduce_dim]
+                next_val = a_storage[next_pos]
+                accumulate = fn(accumulate, next_val)
+
+            out[i] = accumulate
 
     return njit(_reduce, parallel=True)  # type: ignore
 
