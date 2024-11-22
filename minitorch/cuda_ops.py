@@ -473,24 +473,49 @@ def _tensor_matrix_multiply(
     #    b) Copy into shared memory for b matrix
     #    c) Compute the dot produce for position c[i, j]
 
+    # Rows in a for guarding when reading into shared memory
     num_rows_a = a_shape[-2]
+    # Columns in a and rows in b for determining how many shared dimension windows need to be traversed and
+    # for guarding when reading into shared memory
     num_cols_a_rows_b = a_shape[-1]
+    # Columns in b for guarding when reading into shared memory
     num_cols_b = b_shape[-1]
 
+    # Accumulator for dot product of a row in a and a column in b
     acc = 0.0
+
+    # Move over shared dimension and incrementing by BLOCK_DIM at a time since only BLOCK_DIM x BLOCK_DIM elements can be
+    # read into shared memory at a time.
     for k in range(0, num_cols_a_rows_b, BLOCK_DIM):
+        # Load a into shared memory. The final i index is used since output at i should utilize row from a at i.
+        # If pi is used then it may read the wrong row if the shared dimension is not less than BLOCK_DIM, so i must be used to handle multiple blocks in block X,Y space
+        # pj can be used since the whole row should always be loaded, so each thread should read its pj index in the ith row. pj + k is done to move across the shared dimension
         if i < num_rows_a and (pj + k) < num_cols_a_rows_b:
+            # Read each value from the ith row of a into shared memory
+            # Batch must also be multiplied by batch stride to read col from the correct batch
             a_shared[pi, pj] = a_storage[
                 batch * a_batch_stride + i * a_strides[-2] + (pj + k) * a_strides[-1]
             ]
+
+        # Load b into shared memory. The final j index is used since output at j should utilize column from b at j.
+        # If pj is used then it may read the wrong column if the shared dimension is not less than BLOCK_DIM, so j must be used to handle multiple blocks in block X,Y space
+        # pi can be used since the whole column should always be loaded, so each thread should read its pi index in the jth column. pi + k is done to move across the shared dimension
         if pi + k < num_cols_a_rows_b and j < num_cols_b:
+            # Read each value from the jth column of b into shared memory
+            # Batch must also be multiplied by batch stride to read col from the correct batch
             b_shared[pi, pj] = b_storage[
                 batch * b_batch_stride + (pi + k) * b_strides[-2] + j * b_strides[-1]
             ]
+
+        # Sync threads, so post this line all threads have read their values into shared memory for the section of the shared dimension being processed
         cuda.syncthreads()
+
+        # Now compute the dot product for the shared dimension section and accumulate the result into acc
+        # min(BLOCK_DIM, num_cols_a_rows_b - k) is used to handle the case when the portion of shared dimension being processed is less than BLOCK_DIM
         for local_k in range(min(BLOCK_DIM, num_cols_a_rows_b - k)):
             acc += a_shared[pi, local_k] * b_shared[local_k, pj]
 
+    # Write the final accumulated dot product to the output tensor using strides and batch, i, j vals to calculate the output position
     if i < out_shape[-2] and j < out_shape[-1]:
         out_pos = batch * out_strides[-3] + i * out_strides[-2] + j * out_strides[-1]
         out[out_pos] = acc
